@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index.js --host localhost --port 1488 --cache ./cache",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,7 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^12.1.0",
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "fs": "^0.0.1-security",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
