@@ -11,9 +11,13 @@ program
     .requiredOption('-c, --cache <cache>', 'шлях до директорії для кешу')
     .parse(process.argv);
 
+
 const options = program.opts();
 
 const app = express();
+
+app.use(express.text());
+
 app.get('/notes/:noteName', (req, res) => {
     const noteName = req.params.noteName;
     const notePath = path.join(options.cache, `${noteName}.txt`);
