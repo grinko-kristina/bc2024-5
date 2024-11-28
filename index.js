@@ -2,7 +2,7 @@ const express = require('express');
 const { Command } = require('commander');
 const path = require('path');
 const fs = require('fs');
-
+const multer = require('multer');
 const program = new Command();
 
 program
@@ -17,6 +17,7 @@ const options = program.opts();
 const app = express();
 
 app.use(express.text());
+app.use('/write', multer().none())
 
 app.get('/notes/:noteName', (req, res) => {
     const noteName = req.params.noteName;
@@ -49,6 +50,32 @@ app.delete('/notes/:noteName', (req, res) => {
     res.status(200).send('Нотатка видалена');
 });
 
+app.get('/notes', (req, res) => {
+    const notes = fs.readdirSync(options.cache)
+        .filter(file => file.endsWith('.txt'))
+        .map(file => {
+            const noteName = file.replace('.txt', '');
+            const noteContent = fs.readFileSync(path.join(options.cache, file), 'utf8');
+            return {name: noteName, text: noteContent};
+        });
+    res.status(200).json(notes);
+});
+app.post('/write', (req, res) => {
+    const noteName = req.body.note_name;
+    const note = req.body.note;
+    const notePath = path.join(options.cache, `${noteName}.txt`);
+    if (fs.existsSync(notePath)) {
+        return res.status(400).send('нотатка вже існує');
+    }
+    fs.writeFileSync(notePath, note);
+    res.status(201).send('нотатка створена');
+});
+app.get('/UploadForm.html', (req, res) => {
+    const formPath = path.join(options.cache, 'UploadForm.html');
+    const formContent = fs.readFileSync(formPath, 'utf8');
+    res.status(200).send(formContent);
+});
+
 app.listen(options.port, options.host, () => {
-    console.log(`Сервер запущено за адресою http://${options.host}:${options.port}`);
+    console.log(`Сервер запущено на http://${options.host}:${options.port}`);
 });
